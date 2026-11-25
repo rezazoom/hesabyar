@@ -138,6 +138,10 @@ export function openFormModal({
   });
 
   if (!dlg.open) dlg.showModal();
+  requestAnimationFrame(() => {
+    const firstField = form.querySelector('input:not([type="hidden"]), select, textarea');
+    firstField?.focus();
+  });
   return db;
 }
 
@@ -151,6 +155,10 @@ export function openInfoModal({ title, html, wide = false }) {
   dt.textContent = title;
   db.innerHTML = html;
   if (!dlg.open) dlg.showModal();
+  requestAnimationFrame(() => {
+    const firstField = form.querySelector('input:not([type="hidden"]), select, textarea');
+    firstField?.focus();
+  });
   return db;
 }
 

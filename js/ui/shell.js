@@ -18,7 +18,7 @@ import { mountAccounts, renderAccounts } from '../views/accounts.js';
 import { openAppearanceModal } from '../views/appearance.js';
 import { mountBudgets, renderBudgets } from '../views/budgets.js';
 import { mountDashboard, renderDashboard } from '../views/dashboard.js';
-import { openNewMonthModal } from '../views/dialogs.js';
+import { openNewMonthModal, openTxModal } from '../views/dialogs.js';
 import { mountMonths, renderMonths } from '../views/months.js';
 import { mountObligations, renderObligations } from '../views/obligations.js';
 import { mountReports, renderReports } from '../views/reports.js';
@@ -58,6 +58,34 @@ function closeMoreDrawer() {
   ui.moreOpen = false;
   document.getElementById('moreDrawer')?.classList.add('hidden');
   document.getElementById('moreBackdrop')?.classList.add('hidden');
+}
+
+function setBubbleOpen(isOpen) {
+  const root = document.getElementById('quickBubble');
+  if (!root) return;
+  root.classList.toggle('is-open', Boolean(isOpen));
+  const trigger = root.querySelector('.bubble-trigger');
+  trigger?.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+}
+
+function renderQuickBubble() {
+  const root = document.getElementById('quickBubble');
+  if (!root || root.childElementCount > 0) return;
+  root.innerHTML = `
+    <div id="bubbleActions" class="bubble-items" role="menu" aria-label="ثبت سریع تراکنش">
+      <button type="button" class="bubble-item" role="menuitem" data-bubble-act="income">
+        <span class="bubble-fab is-income">${icon('TrendingUp')}</span>
+        <span class="bubble-label">ثبت درآمد</span>
+      </button>
+      <button type="button" class="bubble-item" role="menuitem" data-bubble-act="expense">
+        <span class="bubble-fab is-expense">${icon('TrendingDown')}</span>
+        <span class="bubble-label">ثبت هزینه</span>
+      </button>
+    </div>
+    <button type="button" class="bubble-trigger" aria-expanded="false" aria-haspopup="menu" aria-controls="bubbleActions" aria-label="افزودن سریع درآمد یا هزینه" title="ثبت سریع درآمد / هزینه">
+      ${icon('Plus')}
+    </button>
+  `;
 }
 
 function openMoreDrawer() {
@@ -221,6 +249,7 @@ export function renderApp() {
   renderSidebar(state, dueCount);
   renderTopbar(state);
   renderMobileNav(dueCount);
+  renderQuickBubble();
 
   const viewEl = document.getElementById('view');
   const activeView = VIEWS[ui.tab] || VIEWS.dash;
@@ -292,6 +321,24 @@ async function handleShellAction(act) {
 
 export function initShell() {
   document.addEventListener('click', (e) => {
+    const bubbleTrigger = e.target.closest('#quickBubble .bubble-trigger');
+    if (bubbleTrigger) {
+      const root = document.getElementById('quickBubble');
+      setBubbleOpen(!root?.classList.contains('is-open'));
+      return;
+    }
+
+    const bubbleAct = e.target.closest('[data-bubble-act]')?.getAttribute('data-bubble-act');
+    if (bubbleAct) {
+      setBubbleOpen(false);
+      openTxModal(bubbleAct === 'income' ? 'income' : 'expense');
+      return;
+    }
+
+    if (!e.target.closest('#quickBubble')) {
+      setBubbleOpen(false);
+    }
+
     const navBtn = e.target.closest('[data-nav-id]');
     if (navBtn) {
       navigate(navBtn.getAttribute('data-nav-id'));
@@ -302,6 +349,12 @@ export function initShell() {
     const actBtn = e.target.closest('[data-shell-act]');
     if (actBtn) {
       handleShellAction(actBtn.getAttribute('data-shell-act'));
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      setBubbleOpen(false);
     }
   });
 

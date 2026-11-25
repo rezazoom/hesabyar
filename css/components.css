@@ -496,13 +496,133 @@ dialog::backdrop {
 
 .toast-container {
   position: fixed;
-  bottom: 20px;
-  left: 20px;
+  bottom: 24px;
+  left: 92px;
   z-index: 200;
   display: grid;
   gap: 8px;
-  width: min(360px, calc(100vw - 28px));
+  width: min(360px, calc(100vw - 116px));
   pointer-events: none;
+}
+
+.bubble-menu {
+  position: fixed;
+  bottom: 22px;
+  left: 22px;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.bubble-items {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.bubble-menu.is-open .bubble-items {
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.bubble-item {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 10px;
+  margin-left: 5px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(14px) scale(0.85);
+  transition: opacity 0.18s ease, transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bubble-menu.is-open .bubble-item {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.bubble-menu.is-open .bubble-item:nth-child(1) {
+  transition-delay: 0.04s;
+}
+
+.bubble-menu.is-open .bubble-item:nth-child(2) {
+  transition-delay: 0s;
+}
+
+.bubble-fab {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #101820;
+  box-shadow: var(--shadow-md);
+  border: 1px solid color-mix(in srgb, var(--fg) 15%, transparent);
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.bubble-fab.is-income {
+  background: var(--good);
+}
+
+.bubble-fab.is-expense {
+  background: var(--bad);
+}
+
+.bubble-item:hover .bubble-fab {
+  transform: scale(1.08);
+  filter: brightness(1.06);
+}
+
+.bubble-label {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bubble-trigger {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: var(--accent-text);
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  box-shadow: var(--shadow-md);
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), filter 0.15s ease;
+}
+
+.bubble-trigger:hover {
+  filter: brightness(1.08);
+  transform: scale(1.04);
+}
+
+.bubble-trigger .icon-svg {
+  width: 24px;
+  height: 24px;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bubble-menu.is-open .bubble-trigger .icon-svg {
+  transform: rotate(45deg);
 }
 
 .toast {
@@ -531,13 +651,21 @@ dialog::backdrop {
   color: var(--muted);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 960px) {
+  .bubble-menu {
+    bottom: calc(78px + env(safe-area-inset-bottom));
+    left: 16px;
+  }
+
   .toast-container {
-    bottom: calc(76px + env(safe-area-inset-bottom));
+    bottom: calc(144px + env(safe-area-inset-bottom));
     left: 14px;
     right: 14px;
     width: auto;
   }
+}
+
+@media (max-width: 640px) {
 
   table.mobile-cards thead {
     display: none;
