@@ -15,7 +15,13 @@ const PRECACHE_URLS = [
   './css/tokens.css',
   './css/layout.css',
   './css/components.css',
-  './css/views.css'
+  './css/views.css',
+  './js/date.js',
+  './js/format.js',
+  './js/storage.js',
+  './js/categories.js',
+  './js/migration.js',
+  './js/state.js'
 ];
 
 self.addEventListener('install', (event) => {
