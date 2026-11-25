@@ -65,13 +65,13 @@ function renderPopover() {
   pop.innerHTML = `
     <div class="dp-header">
       <div class="row" style="gap:4px">
-        <button type="button" class="btn btn-icon btn-sm btn-ghost" data-dp-nav="prev-year" title="سال قبل">${icon('ChevronRight', 'sm')}${icon('ChevronRight', 'sm')}</button>
+        <button type="button" class="btn btn-icon btn-sm btn-ghost" data-dp-nav="prev-year" title="سال قبل">${icon('ChevronsRight', 'sm')}</button>
         <button type="button" class="btn btn-icon btn-sm btn-ghost" data-dp-nav="prev-month" title="ماه قبل">${icon('ChevronRight', 'sm')}</button>
       </div>
       <span class="dp-title">${esc(PERSIAN_MONTHS[viewMonth - 1])} ${fmtYear(viewYear)}</span>
       <div class="row" style="gap:4px">
         <button type="button" class="btn btn-icon btn-sm btn-ghost" data-dp-nav="next-month" title="ماه بعد">${icon('ChevronLeft', 'sm')}</button>
-        <button type="button" class="btn btn-icon btn-sm btn-ghost" data-dp-nav="next-year" title="سال بعد">${icon('ChevronLeft', 'sm')}${icon('ChevronLeft', 'sm')}</button>
+        <button type="button" class="btn btn-icon btn-sm btn-ghost" data-dp-nav="next-year" title="سال بعد">${icon('ChevronsLeft', 'sm')}</button>
       </div>
     </div>
     <div class="dp-weekdays">
@@ -187,4 +187,10 @@ export function initDatePicker() {
       closeDatePicker();
     }
   });
+
+  document.addEventListener('close', () => {
+    if (!pop.classList.contains('hidden')) {
+      closeDatePicker();
+    }
+  }, true);
 }

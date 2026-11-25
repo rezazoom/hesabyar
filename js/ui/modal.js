@@ -200,11 +200,45 @@ export function confirmDialog({
   });
 }
 
+function isOutsideDialogRect(dlg, clientX, clientY) {
+  const rect = dlg.getBoundingClientRect();
+  return (
+    clientX < rect.left ||
+    clientX > rect.right ||
+    clientY < rect.top ||
+    clientY > rect.bottom
+  );
+}
+
 export function initModalCloseHandlers() {
+  let pointerDownInside = false;
+
+  document.addEventListener('pointerdown', (e) => {
+    if (e.target instanceof HTMLDialogElement && e.target.open) {
+      pointerDownInside = !isOutsideDialogRect(e.target, e.clientX, e.clientY);
+    } else {
+      pointerDownInside = true;
+    }
+  });
+
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('[data-close-dialog]');
-    if (!btn) return;
-    const id = btn.getAttribute('data-close-dialog');
-    if (id) closeModal(id);
+    if (btn) {
+      const id = btn.getAttribute('data-close-dialog');
+      if (id) closeModal(id);
+      pointerDownInside = false;
+      return;
+    }
+
+    if (
+      e.target instanceof HTMLDialogElement &&
+      e.target.open &&
+      !pointerDownInside &&
+      (e.clientX !== 0 || e.clientY !== 0) &&
+      isOutsideDialogRect(e.target, e.clientX, e.clientY)
+    ) {
+      e.target.close();
+    }
+    pointerDownInside = false;
   });
 }
