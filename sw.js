@@ -25,7 +25,22 @@ const PRECACHE_URLS = [
   './js/ledger.js',
   './js/theme.js',
   './js/charts.js',
-  './js/export.js'
+  './js/export.js',
+  './js/main.js',
+  './js/ui/icons.js',
+  './js/ui/toast.js',
+  './js/ui/modal.js',
+  './js/ui/datepicker.js',
+  './js/ui/shell.js',
+  './js/views/dialogs.js',
+  './js/views/appearance.js',
+  './js/views/dashboard.js',
+  './js/views/accounts.js',
+  './js/views/transactions.js',
+  './js/views/obligations.js',
+  './js/views/budgets.js',
+  './js/views/reports.js',
+  './js/views/months.js'
 ];
 
 self.addEventListener('install', (event) => {
