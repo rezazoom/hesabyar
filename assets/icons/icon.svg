@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="حساب‌یار">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#17384d"/>
+      <stop offset="100%" stop-color="#0b1220"/>
+    </linearGradient>
+    <linearGradient id="gem" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4ee0ad"/>
+      <stop offset="100%" stop-color="#0e937e"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="20" y="20" width="472" height="472" rx="96" fill="none" stroke="#2c4e63" stroke-width="4"/>
+  <path d="M256 92 L408 256 L256 420 L104 256 Z" fill="none" stroke="url(#gem)" stroke-width="26" stroke-linejoin="round"/>
+  <path d="M256 164 L336 256 L256 348 L176 256 Z" fill="url(#gem)"/>
+</svg>
