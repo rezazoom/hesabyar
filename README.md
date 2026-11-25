@@ -51,4 +51,5 @@ Then open `http://localhost:8080` in your browser. Click the browser's install i
 ## Documentation
 
 - **User Guide (Persian)**: [`help.html`](help.html)
+- **What's New & Improvements for End Users (Persian)**: [`docs/IMPROVEMENTS.fa.md`](docs/IMPROVEMENTS.fa.md)
 - **Technical Architecture & Data Schema**: [`docs/TECHNICAL.md`](docs/TECHNICAL.md)
