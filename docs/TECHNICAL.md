@@ -85,7 +85,7 @@ flowchart LR
 | `hesabyar-v2` | `localStorage` | Primary JSON state (`version: 2`) |
 | `hesabyar-v1` | `localStorage` | Legacy PRO 3.3 state (kept intact as read-only fallback after auto-migration) |
 | `hesabyar-previous` | `localStorage` | Single-step undo snapshot updated prior to state mutations |
-| `hesabyar-appearance` | `localStorage` | Theme ID, font choice (`arad` / `system` / `custom`), size (`12..20`), custom hex overrides |
+| `hesabyar-appearance` | `localStorage` | Theme ID, font choice (`arad` / `system` / `custom`), size (`12..20`), radius scale (`0..180`), custom hex overrides |
 | `hesabyar-assets` (`fonts` store) | `IndexedDB` | Binary/DataURL storage for user-uploaded custom fonts (migrated off `localStorage` to protect financial quota) |
 
 ---

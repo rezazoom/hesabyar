@@ -130,7 +130,7 @@
 .debt-bar {
   display: flex;
   height: 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   background: color-mix(in srgb, var(--fg) 12%, var(--bg));
 }
@@ -203,8 +203,26 @@
 .swatches i {
   height: 18px;
   flex: 1;
-  border-radius: 5px;
+  border-radius: var(--radius-xs);
   border: 1px solid rgba(136, 136, 136, 0.35);
+}
+
+.radius-control {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.radius-presets {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+@media (max-width: 520px) {
+  .radius-presets {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .appearance-preview {

@@ -36,7 +36,7 @@
 .brand-mark {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   display: grid;
   place-items: center;
   background: linear-gradient(135deg, var(--accent), var(--accent2));
@@ -253,7 +253,7 @@
     gap: 3px;
     padding: 6px 2px;
     border: 0;
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
     background: transparent;
     color: var(--muted);
     font-size: 11px;
@@ -287,7 +287,7 @@
     padding: 18px 16px calc(24px + env(safe-area-inset-bottom));
     background: var(--surface);
     border-top: 1px solid var(--border);
-    border-radius: 20px 20px 0 0;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     box-shadow: var(--shadow-md);
   }
 

@@ -23,10 +23,24 @@ export const FONT_STACKS = {
   custom: "'HesabCustom', 'HesabArad', Tahoma, sans-serif",
 };
 
+export const RADIUS_PRESETS = [
+  { value: 0, label: 'تیز' },
+  { value: 50, label: 'کم' },
+  { value: 100, label: 'متعادل' },
+  { value: 160, label: 'گرد' },
+];
+
+export function clampRadius(value) {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 100;
+  return Math.max(0, Math.min(180, Math.round(n)));
+}
+
 let appearance = {
   theme: 'ocean',
   font: 'arad',
   size: 14,
+  radius: 100,
   colors: {},
 };
 
@@ -60,6 +74,8 @@ export function applyAppearance() {
   const accent = hexColor(c.accent, t[3]);
   const accent2 = hexColor(c.accent2, t[4]);
   const size = Math.max(12, Math.min(20, Number(appearance.size) || 14));
+  const radiusPct = clampRadius(appearance.radius ?? 100);
+  const rScale = radiusPct / 100;
 
   document.body.classList.toggle('light', isLight);
 
@@ -79,6 +95,12 @@ export function applyAppearance() {
     'accent-text': contrastColor(accent),
     'ui-font': FONT_STACKS[appearance.font] || FONT_STACKS.arad,
     'ui-size': `${size}px`,
+    'radius-scale': String(rScale),
+    'radius-xs': `${Math.round(5 * rScale)}px`,
+    'radius-sm': `${Math.round(8 * rScale)}px`,
+    'radius-md': `${Math.round(12 * rScale)}px`,
+    'radius-lg': `${Math.round(16 * rScale)}px`,
+    'radius-xl': `${Math.round(22 * rScale)}px`,
   };
 
   for (const [k, v] of Object.entries(vars)) {
@@ -93,6 +115,7 @@ export function applyAppearance() {
 
 export function setAppearance(patch, { persist = true } = {}) {
   appearance = { ...appearance, ...patch };
+  appearance.radius = clampRadius(appearance.radius ?? 100);
   if (!Object.hasOwn(FONT_STACKS, appearance.font)) appearance.font = 'arad';
   if (persist) {
     try {
@@ -110,7 +133,7 @@ export function toggleLightDark() {
 }
 
 export function resetAppearance() {
-  setAppearance({ theme: 'ocean', font: 'arad', size: 14, colors: {} });
+  setAppearance({ theme: 'ocean', font: 'arad', size: 14, radius: 100, colors: {} });
 }
 
 export async function loadCustomFontFace(dataUrl) {
@@ -157,6 +180,7 @@ export async function initTheme({ legacyLight = false } = {}) {
   if (!Object.hasOwn(FONT_STACKS, appearance.font)) {
     appearance.font = 'arad';
   }
+  appearance.radius = clampRadius(appearance.radius ?? 100);
   applyAppearance();
 
   const fontAsset = await migrateLegacyFontFromLocalStorage();

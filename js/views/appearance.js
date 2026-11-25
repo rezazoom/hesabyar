@@ -1,9 +1,11 @@
 import { esc, toPersianDigits } from '../format.js';
 import {
+  clampRadius,
   clearCustomFont,
   getAppearance,
   hexColor,
   importCustomFontFile,
+  RADIUS_PRESETS,
   resetAppearance,
   setAppearance,
   THEMES,
@@ -24,6 +26,7 @@ export function renderAppearanceModal() {
 
   const app = getAppearance();
   const activeTheme = THEMES[app.theme] || THEMES.ocean;
+  const radiusPct = clampRadius(app.radius ?? 100);
 
   container.innerHTML = `
     <small>تغییرات بلافاصله روی کل برنامه و نمودارها اعمال و مستقل از اطلاعات مالی ذخیره می‌شوند.</small>
@@ -77,9 +80,29 @@ export function renderAppearanceModal() {
         .join('')}
     </div>
 
+    <div class="radius-control">
+      <div class="row between">
+        <span style="color:var(--muted);font-size:13px">گردی گوشه‌ها (Border Radius): <b id="appRadiusVal">${toPersianDigits(radiusPct)}٪</b></span>
+      </div>
+      <div class="radius-presets">
+        ${RADIUS_PRESETS.map(
+          (p) => `
+          <button type="button" class="btn btn-sm ${radiusPct === p.value ? 'btn-primary' : 'btn-ghost'}" data-radius-preset="${p.value}">
+            ${esc(p.label)} (${toPersianDigits(p.value)}٪)
+          </button>
+        `
+        ).join('')}
+      </div>
+      <input id="appRadiusRange" type="range" min="0" max="180" step="5" value="${radiusPct}" aria-label="میزان گردی گوشه‌ها">
+    </div>
+
     <div class="appearance-preview">
       <small>پیش‌نمایش زنده · موجودی تخمینی</small>
       <h1 class="green" style="margin:6px 0">۲۵٬۸۰۰٬۰۰۰ تومان</h1>
+      <div class="row" style="margin-bottom:10px">
+        <button type="button" class="btn btn-sm btn-primary" tabindex="-1">دکمه نمونه</button>
+        <button type="button" class="btn btn-sm btn-ghost" tabindex="-1">دکمه ثانویه</button>
+      </div>
       <div class="row">
         <span class="state paid">تسویه شده</span>
         <span class="state partial">پرداخت جزئی</span>
@@ -117,6 +140,32 @@ export function renderAppearanceModal() {
     const label = container.querySelector('#appSizeVal');
     if (label) label.textContent = toPersianDigits(size);
     setAppearance({ size });
+  });
+
+  const syncRadiusButtons = (val) => {
+    const label = container.querySelector('#appRadiusVal');
+    if (label) label.textContent = `${toPersianDigits(val)}٪`;
+    container.querySelectorAll('[data-radius-preset]').forEach((btn) => {
+      const match = Number(btn.getAttribute('data-radius-preset')) === val;
+      btn.classList.toggle('btn-primary', match);
+      btn.classList.toggle('btn-ghost', !match);
+    });
+  };
+
+  container.querySelectorAll('[data-radius-preset]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const val = clampRadius(btn.getAttribute('data-radius-preset'));
+      const range = container.querySelector('#appRadiusRange');
+      if (range) range.value = String(val);
+      syncRadiusButtons(val);
+      setAppearance({ radius: val });
+    });
+  });
+
+  container.querySelector('#appRadiusRange')?.addEventListener('input', (e) => {
+    const val = clampRadius(e.target.value);
+    syncRadiusButtons(val);
+    setAppearance({ radius: val });
   });
 
   container.querySelectorAll('[data-color-key]').forEach((inp) => {

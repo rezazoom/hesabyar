@@ -6,6 +6,7 @@ const chartInstances = new Map();
 function readThemePalette() {
   const cs = getComputedStyle(document.documentElement);
   const get = (name, fallback) => cs.getPropertyValue(name).trim() || fallback;
+  const rawScale = parseFloat(get('--radius-scale', '1'));
   return {
     fg: get('--fg', '#e5edf8'),
     muted: get('--muted', '#9eb1ca'),
@@ -17,6 +18,7 @@ function readThemePalette() {
     accent2: get('--accent2', '#5179c4'),
     surface: get('--surface', '#141f31'),
     font: get('--ui-font', 'HesabArad, Tahoma, sans-serif'),
+    radiusScale: Number.isFinite(rawScale) ? rawScale : 1,
   };
 }
 
@@ -112,13 +114,13 @@ export function renderMonthlyCashflowBar(canvas, rows, { key = 'monthly-bar' } =
           label: 'ورودی',
           data: rows.map((r) => r.i),
           backgroundColor: p.good,
-          borderRadius: 6,
+          borderRadius: Math.round(6 * p.radiusScale),
         },
         {
           label: 'خروجی',
           data: rows.map((r) => r.o),
           backgroundColor: p.bad,
-          borderRadius: 6,
+          borderRadius: Math.round(6 * p.radiusScale),
         },
       ],
     },
@@ -177,7 +179,7 @@ export function renderAccountBalancesBar(canvas, accountSummaries, { key = 'acco
           backgroundColor: accountSummaries.map((a) =>
             a.balance < 0 ? p.bad : a.account.color || p.accent
           ),
-          borderRadius: 8,
+          borderRadius: Math.round(8 * p.radiusScale),
         },
       ],
     },
