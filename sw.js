@@ -21,7 +21,11 @@ const PRECACHE_URLS = [
   './js/storage.js',
   './js/categories.js',
   './js/migration.js',
-  './js/state.js'
+  './js/state.js',
+  './js/ledger.js',
+  './js/theme.js',
+  './js/charts.js',
+  './js/export.js'
 ];
 
 self.addEventListener('install', (event) => {
