@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>راهنمای استفاده | حساب‌یار</title>
+  <link rel="icon" href="./assets/icons/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/tokens.css">
+  <link rel="stylesheet" href="./css/components.css">
+  <style>
+    .help-wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 24px 18px 56px;
+    }
+    .help-hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+      padding: 22px 24px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(125deg, color-mix(in srgb, var(--accent) 22%, var(--surface)), var(--surface));
+      border: 1px solid color-mix(in srgb, var(--accent) 50%, var(--border));
+      margin-bottom: 18px;
+    }
+    .help-toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 20px;
+    }
+    .help-toc a {
+      text-decoration: none;
+    }
+    .help-section {
+      margin-top: 16px;
+    }
+    .help-section h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .help-section ul {
+      margin: 8px 0 0;
+      padding-right: 20px;
+      display: grid;
+      gap: 6px;
+    }
+    code {
+      direction: ltr;
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: color-mix(in srgb, var(--fg) 10%, var(--bg));
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <main class="help-wrap">
+    <header class="help-hero">
+      <div>
+        <small>مستندات کاربری کاملاً آفلاین</small>
+        <h1>راهنمای جامع حساب‌یار</h1>
+        <small>آموزش مدیریت کارت‌ها، تراکنش‌ها، اقساط، بودجه و گزارش‌های مالی</small>
+      </div>
+      <div class="row">
+        <a class="btn btn-primary" href="./index.html">بازگشت به برنامه حساب‌یار</a>
+      </div>
+    </header>
+
+    <nav class="help-toc" aria-label="فهرست مطالب">
+      <a class="pill" href="#start">۱. شروع کار و نصب PWA</a>
+      <a class="pill" href="#accounts">۲. کارت‌ها و انتقال وجه</a>
+      <a class="pill" href="#carryover">۳. موجودی اول ماه و انتقال خودکار</a>
+      <a class="pill" href="#transactions">۴. تراکنش‌ها و تقویم شمسی</a>
+      <a class="pill" href="#obligations">۵. اقساط، قبوض و قرض</a>
+      <a class="pill" href="#budgets">۶. بودجه و قوانین تکرار</a>
+      <a class="pill" href="#reports">۷. گزارش‌ها، اکسل و پشتیبان</a>
+      <a class="pill" href="#appearance">۸. شخصی‌سازی ظاهر و فونت</a>
+    </nav>
+
+    <section id="start" class="panel help-section">
+      <h2>۱. شروع کار و نصب به عنوان برنامه (PWA)</h2>
+      <p>
+        تمام اطلاعات مالی شما در حساب‌یار <strong>فقط روی مرورگر همین دستگاه</strong> ذخیره می‌شود و هیچ اطلاعاتی به سرور ارسال نمی‌شود.
+      </p>
+      <ul>
+        <li>برای اجرا کافی است پوشه پروژه را روی یک وب‌سرور محلی (مثلاً <code>python3 -m http.server 8080</code>) یا هاست استاتیک اجرا کنید.</li>
+        <li>پس از باز کردن برنامه، می‌توانید از منوی مرورگر گزینه <strong>Install / افزودن به صفحه اصلی</strong> را بزنید تا حساب‌یار بدون نیاز به اینترنت اجرا شود.</li>
+      </ul>
+    </section>
+
+    <section id="accounts" class="panel help-section">
+      <h2>۲. مدیریت کارت‌ها، حساب‌ها و انتقال بین حساب‌ها</h2>
+      <p>در بخش <strong>کارت‌ها و انتقال</strong> می‌توانید چند حساب بانکی، کیف پول نقد یا حساب پس‌انداز تعریف کنید:</p>
+      <ul>
+        <li>هنگام ثبت هر درآمد، هزینه، پرداخت قسط یا قرض، مشخص می‌کنید پول از کدام کارت کم یا به کدام کارت واریز شود.</li>
+        <li>برای جابه‌جایی پول بین کارت‌های خودتان از دکمه <strong>انتقال بین حساب‌ها</strong> استفاده کنید. این انتقال موجودی کارت مبدا و مقصد را به‌روز می‌کند اما در جمع درآمد یا هزینه ماه شمرده نمی‌شود.</li>
+      </ul>
+    </section>
+
+    <section id="carryover" class="panel help-section">
+      <h2>۳. موجودی اول ماه و انتقال خودکار مانده</h2>
+      <p>
+        در حالت پیش‌فرض، مانده پایان هر ماه به صورت خودکار به عنوان موجودی ابتدای ماه بعد منتقل می‌شود (برچسب <strong>خودکار</strong>).
+      </p>
+      <ul>
+        <li>اگر در ماه جاری بخواهید موجودی کارت‌ها را با موجودی واقعی بانک تطبیق دهید، از دکمه <strong>موجودی ابتدای ماه</strong> در داشبورد یا بخش <strong>مدیریت ماه‌ها</strong> استفاده کنید.</li>
+        <li>در صورت ثبت موجودی دستی، هر زمان می‌توانید با دکمه <strong>بازگشت به انتقال خودکار ماه قبل</strong> دوباره به زنجیره خودکار برگردید.</li>
+      </ul>
+    </section>
+
+    <section id="transactions" class="panel help-section">
+      <h2>۴. ثبت درآمد و هزینه، دسته‌بندی و تقویم شمسی</h2>
+      <ul>
+        <li>در بخش <strong>درآمد و هزینه</strong> می‌توانید تراکنش‌ها را بر اساس متن، نوع، دسته‌بندی، کارت و ترتیب تاریخ یا مبلغ جستجو و مرتب کنید.</li>
+        <li>در فیلدهای دسته‌بندی می‌توانید از دسته‌های آماده استفاده کنید یا نام دسته جدید تایپ کنید تا خودکار ساخته شود.</li>
+        <li>کنار هر فیلد تاریخ، آیکون تقویم قرار دارد که با کلیک روی آن <strong>تقویم تعاملی شمسی</strong> همراه با میانبرهای «امروز»، «دیروز» و «اول ماه» باز می‌شود.</li>
+      </ul>
+    </section>
+
+    <section id="obligations" class="panel help-section">
+      <h2>۵. اقساط، قبوض متغیر و قرض و طلب (پرداخت جزئی)</h2>
+      <p>بخش <strong>تعهدات</strong> شامل سه تب زیر است:</p>
+      <ul>
+        <li><strong>اقساط و وام‌ها</strong>: تعریف جدول اقساط در دو مرحله و امکان ویرایش برنامه‌های فعال بدون از بین رفتن پرداخت‌های قبلی.</li>
+        <li><strong>قبوض و شارژ</strong>: ثبت قبوض تکی یا دوره‌ای. اگر مبلغ قبضی مثل برق یا آب در یک ماه متفاوت بود، با دکمه <strong>تغییر مبلغ این ماه</strong> فقط همان دوره را ویرایش کنید.</li>
+        <li><strong>قرض و طلب</strong>: ثبت بدهی و طلب و تسویه به صورت <strong>یکجا یا پرداخت جزئی در چند نوبت</strong> همراه با تاریخچه کامل پرداخت‌ها.</li>
+      </ul>
+    </section>
+
+    <section id="budgets" class="panel help-section">
+      <h2>۶. بودجه‌بندی ماهانه و قوانین تکرارشونده</h2>
+      <ul>
+        <li><strong>بودجه دسته‌بندی</strong>: برای هر دسته هزینه (مثل خوراک یا تفریح) سقف ماهانه تعیین کنید. در مصرف ۸۰٪ هشدار زرد و در عبور از ۱۰۰٪ هشدار قرمز نمایش داده می‌شود.</li>
+        <li><strong>قوانین تکرار</strong>: برای حقوق یا هزینه‌های ثابت ماهانه قانون تعریف کنید. در حالت پیش‌فرض، در تاریخ سررسید یک یادآور یک‌کلیکی روی داشبورد ظاهر می‌شود تا با تأیید شما وارد حساب شود؛ همچنین می‌توانید گزینه <strong>ثبت خودکار</strong> را فعال کنید.</li>
+      </ul>
+    </section>
+
+    <section id="reports" class="panel help-section">
+      <h2>۷. گزارش‌ها، نمودارها، اکسل و پشتیبان‌گیری</h2>
+      <ul>
+        <li>در بخش <strong>گزارش و تحلیل</strong> بازه چندماهه را فیلتر کنید، نمودارهای میله‌ای و دایره‌ای را ببینید و خروجی <strong>CSV</strong> یا فایل <strong>اکسل (<code>.xlsx</code>)</strong> دریافت کنید.</li>
+        <li>از دکمه <strong>پشتیبان</strong> مرتب خروجی <code>JSON</code> بگیرید. فایل‌های پشتیبان نسخه قدیمی <strong>PRO 3.3</strong> نیز به صورت خودکار و کامل قابل ورود و تبدیل هستند.</li>
+      </ul>
+    </section>
+
+    <section id="appearance" class="panel help-section">
+      <h2>۸. شخصی‌سازی ظاهر و فونت</h2>
+      <ul>
+        <li>در پنجره <strong>شخصی‌سازی ظاهر</strong> می‌توانید بین ۸ تم آماده، ۴ رنگ دلخواه، اندازه فونت و فونت پیش‌فرض <strong>آراد ۲.۵.۱</strong> انتخاب کنید.</li>
+        <li>در صورت وارد کردن فونت دلخواه (<code>WOFF2 / TTF / OTF</code>)، فایل فونت در <code>IndexedDB</code> ذخیره می‌شود تا فضای ذخیره اطلاعات مالی پر نشود.</li>
+      </ul>
+    </section>
+  </main>
+
+  <script type="module">
+    import { initTheme } from './js/theme.js';
+    initTheme();
+  </script>
+</body>
+</html>

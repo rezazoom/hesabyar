@@ -3,6 +3,7 @@ const CACHE_NAME = 'hesabyar-cache-v1';
 const PRECACHE_URLS = [
   './',
   './index.html',
+  './help.html',
   './manifest.webmanifest',
   './assets/fonts/AradFDVF.woff2',
   './assets/icons/icon.svg',
