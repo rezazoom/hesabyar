@@ -1,6 +1,6 @@
 import { getCategoryMeta } from '../categories.js';
 import { renderAccountBalancesBar, renderCategoryDoughnut } from '../charts.js';
-import { currentMonth, daysDiff, dueDate, monthName, today } from '../date.js';
+import { currentMonth, daysDiff, monthName, today } from '../date.js';
 import { esc, fmt, uid } from '../format.js';
 import {
   ACCOUNT_TYPE_LABELS,
@@ -11,29 +11,15 @@ import {
   getObligationStatus,
   TYPE_LABELS,
 } from '../ledger.js';
-import { ensureMonthListed, mutateState, ui } from '../state.js';
+import { ensureMonthListed, mutateState } from '../state.js';
 import { icon } from '../ui/icons.js';
 import { tableHtml } from '../ui/modal.js';
 import { showToast } from '../ui/toast.js';
 import {
-  openBillModal,
-  openLoanModal,
   openOpeningModal,
   openPaymentModal,
-  openPlanWizardModal,
   openTransferModal,
-  openTxModal,
 } from './dialogs.js';
-
-function kpiCard(label, value, colorClass = '', sub = 'تومان') {
-  return `
-    <div class="card">
-      <small>${esc(label)}</small>
-      <strong class="${esc(colorClass)}" data-num="1">${fmt(value)}</strong>
-      <small>${esc(sub)}</small>
-    </div>
-  `;
-}
 
 function obligationRowsHtml(state, list) {
   return list.map((o) => {
@@ -41,9 +27,9 @@ function obligationRowsHtml(state, list) {
     const kindLabel = TYPE_LABELS[o.kind] || o.kind;
     const amtText =
       o.paidSum > 0 && o.remaining > 0
-        ? `${fmt(o.remaining)} <small class="muted">از ${fmt(o.amount)}</small>`
-        : fmt(o.amount);
-    const payLabel = o.remaining === 0 ? 'سوابق تسویه' : o.paidSum > 0 ? 'ادامه پرداخت' : 'ثبت تسویه';
+        ? `<span class="num">${fmt(o.remaining)}</span> <small class="muted">از ${fmt(o.amount)}</small>`
+        : `<span class="num">${fmt(o.amount)}<span class="unit">تومان</span></span>`;
+    const payLabel = o.remaining === 0 ? 'سوابق' : o.paidSum > 0 ? 'ادامه پرداخت' : 'تسویه';
     const btnCls = o.remaining === 0 ? 'btn-ghost' : 'btn-primary';
     return [
       esc(o.title),
@@ -59,13 +45,13 @@ function obligationRowsHtml(state, list) {
 export function renderDashboard(state) {
   const m = state.month;
   const metrics = computeDashboardMetrics(state, m);
-  const colorOf = (v) => (v < 0 ? 'red' : 'green');
   const pct = Math.round((metrics.monthPaidTotal / Math.max(1, metrics.monthDebtTotal)) * 100);
   const dueRecurring = getDueRecurringItems(state);
   const budgets = computeBudgetUsage(state, m);
   const warnBudgets = budgets.filter((b) => b.level !== 'good');
 
   const now = today();
+  const curMonth = currentMonth();
   const upcoming = metrics.allObligations
     .filter((x) => x.remaining > 0 && daysDiff(x.date, now) >= 0 && daysDiff(x.date, now) <= 7)
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -77,45 +63,61 @@ export function renderDashboard(state) {
 
   const recentLedger = [...metrics.c]
     .sort((a, b) => b.date.localeCompare(a.date))
-    .slice(0, 10)
+    .slice(0, 8)
     .map((x) => [
       esc(x.title),
       esc(TYPE_LABELS[x.type] || x.type),
       esc(getAccountName(state, x.accountId)),
       esc(x.date),
-      `<span class="${x.sign > 0 ? 'green' : 'red'} num">${x.sign > 0 ? '+' : '−'} ${fmt(x.amount)}</span>`,
+      `<span class="${x.sign > 0 ? 'green' : 'red'} num-ltr">${x.sign > 0 ? '+' : '−'} ${fmt(x.amount)}</span> <span class="unit">تومان</span>`,
     ]);
 
   const line = (label, value, cls = '') => `
     <div class="mini-line">
       <span>${esc(label)}</span>
-      <b class="${esc(cls)} num">${fmt(value)} تومان</b>
+      <b class="${esc(cls)} num"><span class="num-ltr">${fmt(value)}</span><span class="unit">تومان</span></b>
     </div>
   `;
 
   return `
-    <div class="hero">
-      <div>
-        <small>مرکز کنترل پول من</small>
-        <h1>${esc(monthName(m))}</h1>
-        <small>محاسبه تا ${esc(metrics.cut)} · امروز ${esc(now)} · ${
-          metrics.hasManualOverride ? 'شروع ماه: موجودی دستی' : 'شروع ماه: انتقال خودکار از ماه قبل'
-        }</small>
+    <section class="cockpit-summary">
+      <div class="cockpit-top">
+        <div class="cockpit-balance">
+          <div class="row" style="gap:8px">
+            <small>موجودی کل حساب‌ها · ${esc(monthName(m))}</small>
+            <span class="pill">${metrics.hasManualOverride ? 'شروع ماه: دستی' : 'انتقال خودکار'}</span>
+          </div>
+          <div class="cockpit-balance-val ${metrics.net < 0 ? 'is-neg' : ''} num">
+            <span class="num-ltr">${fmt(metrics.net)}</span><span class="unit">تومان</span>
+          </div>
+          <small>به‌روزرسانی گردش تا ${esc(metrics.cut)}</small>
+        </div>
+        <div class="row">
+          <button type="button" class="btn btn-sm btn-ghost" data-dash-act="opening">${icon('SlidersHorizontal', 'sm')} موجودی اول ماه</button>
+          <button type="button" class="btn btn-sm btn-ghost" data-dash-act="add-transfer">${icon('ArrowLeftRight', 'sm')} انتقال کارت</button>
+          ${
+            m !== curMonth
+              ? `<button type="button" class="btn btn-sm btn-primary" data-dash-act="current-month">${icon('Calendar', 'sm')} ماه جاری</button>`
+              : ''
+          }
+        </div>
       </div>
-      <div class="row">
-        <button type="button" class="btn btn-ghost" data-dash-act="opening">${icon('SlidersHorizontal', 'sm')} موجودی ابتدای ماه</button>
-        <button type="button" class="btn btn-primary" data-dash-act="current-month">${icon('Calendar', 'sm')} ماه جاری</button>
-      </div>
-    </div>
 
-    <div class="actions">
-      <button type="button" class="btn btn-primary" data-dash-act="add-income">${icon('Plus', 'sm')} درآمد</button>
-      <button type="button" class="btn btn-secondary" data-dash-act="add-expense">${icon('Plus', 'sm')} هزینه</button>
-      <button type="button" class="btn btn-ghost" data-dash-act="add-transfer">${icon('ArrowLeftRight', 'sm')} انتقال کارت</button>
-      <button type="button" class="btn btn-ghost" data-dash-act="add-plan">${icon('CalendarClock', 'sm')} قسط</button>
-      <button type="button" class="btn btn-ghost" data-dash-act="add-bill">${icon('Receipt', 'sm')} قبض</button>
-      <button type="button" class="btn btn-ghost" data-dash-act="add-loan">${icon('Landmark', 'sm')} قرض / طلب</button>
-    </div>
+      <div class="cockpit-metrics">
+        <div class="cockpit-metric">
+          <small>ورودی ماه</small>
+          <strong class="num"><span class="green">+</span> ${fmt(metrics.inc)}<span class="unit">تومان</span></strong>
+        </div>
+        <div class="cockpit-metric">
+          <small>خروجی ماه</small>
+          <strong class="num"><span class="red">−</span> ${fmt(metrics.out)}<span class="unit">تومان</span></strong>
+        </div>
+        <div class="cockpit-metric">
+          <small>مانده پس از تعهدات</small>
+          <strong class="num ${metrics.after < 0 ? 'red' : ''}"><span class="num-ltr">${fmt(metrics.after)}</span><span class="unit">تومان</span></strong>
+        </div>
+      </div>
+    </section>
 
     ${
       dueRecurring.length
@@ -126,7 +128,7 @@ export function renderDashboard(state) {
           <button type="button" class="btn btn-sm btn-ghost" data-dash-nav="budgets">مدیریت تکرارها</button>
         </div>
         ${dueRecurring
-          .slice(0, 5)
+          .slice(0, 4)
           .map(
             (item) => `
           <div class="mini-line">
@@ -135,9 +137,9 @@ export function renderDashboard(state) {
               <small class="muted"> · ${item.rule.type === 'income' ? 'درآمد' : 'هزینه'} · ${esc(item.dueDate)} · ${esc(getAccountName(state, item.rule.accountId))}</small>
             </div>
             <div class="row">
-              <b class="${item.rule.type === 'income' ? 'green' : 'red'} num">${fmt(item.rule.amount)} تومان</b>
+              <b class="num"><span class="${item.rule.type === 'income' ? 'green' : 'red'}">${item.rule.type === 'income' ? '+' : '−'}</span> ${fmt(item.rule.amount)}<span class="unit">تومان</span></b>
               <button type="button" class="btn btn-sm btn-primary" data-rec-post="${esc(item.rule.id)}|${esc(item.month)}|${esc(item.dueDate)}">تأیید و ثبت</button>
-              <button type="button" class="btn btn-sm btn-ghost" data-rec-skip="${esc(item.rule.id)}|${esc(item.month)}">رد کردن</button>
+              <button type="button" class="btn btn-sm btn-ghost" data-rec-skip="${esc(item.rule.id)}|${esc(item.month)}">رد</button>
             </div>
           </div>
         `
@@ -155,31 +157,26 @@ export function renderDashboard(state) {
         ${icon('AlertTriangle', 'sm')}
         <div>
           <b>هشدار بودجه ماه:</b>
-          ${warnBudgets
-            .map((b) => `${esc(b.category)} (${fmt(b.pct)}٪ مصرف)`)
-            .join(' · ')}
+          ${warnBudgets.map((b) => `${esc(b.category)} (${fmt(b.pct)}٪ مصرف)`).join(' · ')}
         </div>
       </div>
     `
         : ''
     }
 
-    <div class="section-title"><h2>پول من کجاست؟</h2></div>
-    <div class="finance-main">
-      ${kpiCard('موجودی تخمینی کل حساب‌ها تا این لحظه', metrics.net, colorOf(metrics.net), 'موجودی اول ماه + دریافتی‌ها − پرداختی‌ها')}
-      ${kpiCard('پولی که بعد از تعهدات این ماه می‌ماند', metrics.after, colorOf(metrics.after), 'با احتساب معوقات و بدهی‌های باز این ماه')}
-    </div>
-
     <div class="accounts-strip">
       ${metrics.accountSummaries
         .map(
           (s) => `
-        <div class="account-card" style="--card-accent:${esc(s.account.color || '#0e937e')}">
+        <div class="account-card">
           <div class="row between">
-            <b>${esc(s.account.name)}</b>
+            <span class="account-title">
+              <span class="account-dot" style="background:${esc(s.account.color || '#0e937e')}"></span>
+              <b>${esc(s.account.name)}</b>
+            </span>
             <small class="pill">${esc(ACCOUNT_TYPE_LABELS[s.account.type] || s.account.type)}</small>
           </div>
-          <strong class="${s.balance < 0 ? 'red' : 'green'} num">${fmt(s.balance)} <small>تومان</small></strong>
+          <strong class="${s.balance < 0 ? 'red' : ''} num"><span class="num-ltr">${fmt(s.balance)}</span><span class="unit">تومان</span></strong>
           <small>اول ماه: <span class="num-ltr">${fmt(s.opening)}</span> (${s.openingSource === 'manual' ? 'دستی' : 'خودکار'})</small>
         </div>
       `
@@ -187,80 +184,83 @@ export function renderDashboard(state) {
         .join('')}
     </div>
 
-    <div class="finance-grid" style="margin-top:12px">
-      ${kpiCard('ورودی واقعی تا الان', metrics.inc, 'green', 'بدون احتساب انتقال‌های داخلی')}
-      ${kpiCard('خروجی واقعی تا الان', metrics.out, 'red', 'تمام پرداخت‌های واقعی ماه')}
-      ${kpiCard('مانده بدهی لازم تا پایان ماه', metrics.needTotal, 'amber', 'بدهی این ماه + معوقات قبلی')}
-    </div>
-
-    <div class="charts-grid">
+    <div class="cockpit-bento">
       <div class="panel">
-        <div class="panel-head"><h2>ترکیب هزینه‌های ماه بر اساس دسته‌بندی</h2></div>
+        <div class="panel-head">
+          <h2>ترکیب هزینه‌های ماه</h2>
+          <button type="button" class="btn btn-sm btn-ghost" data-dash-nav="reports">گزارش کامل</button>
+        </div>
         <div class="chart-box"><canvas id="dashCategoryChart"></canvas></div>
       </div>
+
       <div class="panel">
-        <div class="panel-head"><h2>موجودی حساب‌ها و کارت‌ها</h2></div>
-        <div class="chart-box"><canvas id="dashAccountsChart"></canvas></div>
-      </div>
-    </div>
-
-    <div class="section-title">
-      <h2>وضعیت بدهی‌ها و اقساط</h2>
-      <small>با پشتیبانی از پرداخت جزئی</small>
-    </div>
-    <div class="finance-grid">
-      ${kpiCard('کل بدهی سررسید این ماه', metrics.monthDebtTotal, '', 'پرداخت‌شده + باقی‌مانده')}
-      ${kpiCard('پرداخت‌شده از بدهی ماه', metrics.monthPaidTotal, 'green', `${fmt(metrics.monthPaidCount)} مورد تسویه کامل`)}
-      ${kpiCard('باقی‌مانده از بدهی ماه', metrics.monthOpenTotal, 'amber', `${fmt(metrics.monthOpenCount)} مورد باز`)}
-      ${kpiCard('کل بدهی زنده امروز', metrics.liveDebtTotal, 'amber', 'تمام اقساط و بدهی‌های باز')}
-      ${kpiCard('بدهی عقب‌افتاده امروز', metrics.actualLateTotal, 'red', `${fmt(metrics.actualLate.length)} مورد`)}
-      ${kpiCard('کل مطالبات باز امروز', metrics.receivablesTotal, 'green', 'پولی که باید پس بگیرید')}
-    </div>
-
-    <div class="charts-grid">
-      <div class="panel">
-        <h2>اگر همه بدهی‌ها را یکجا بدهم</h2>
-        ${line('موجودی تخمینی در تاریخ انتخاب‌شده', metrics.net, colorOf(metrics.net))}
-        ${line('کل بدهی باقی‌مانده در همان تاریخ', metrics.allOpenTotal, 'amber')}
-        ${line(metrics.allAfter < 0 ? 'کسری برای تسویه کامل' : 'مانده پس از تسویه کامل', Math.abs(metrics.allAfter), colorOf(metrics.allAfter))}
-      </div>
-      <div class="panel">
-        <h2>جزئیات پول آزاد پایان ماه</h2>
-        ${line('موجودی ابتدای ماه', metrics.opening)}
-        ${line('درآمد واقعی دریافت‌شده', metrics.earned, 'green')}
-        ${line('کل پرداخت واقعی (هزینه و تعهدات)', metrics.out, 'red')}
-        ${line('دریافتی ثبت‌شده آتی همین ماه', metrics.plannedIn, 'green')}
-        ${line('خروجی ثبت‌شده آتی همین ماه', metrics.plannedOut, 'amber')}
-        ${line('معوقات از ماه‌های قبل', metrics.lateTotal, 'red')}
+        <div class="panel-head">
+          <h2>تعهدات و بدهی‌های ماه</h2>
+          <button type="button" class="btn btn-sm btn-ghost" data-dash-nav="obligations">مدیریت تعهدات</button>
+        </div>
+        <div class="mini-line"><span>پیشرفت تسویه ماه</span><b class="num">${fmt(pct)}٪</b></div>
+        <div class="debt-bar" style="margin:6px 0 12px">
+          <span style="width:${Math.min(100, pct)}%"></span>
+          <span style="width:${Math.max(0, 100 - pct)}%"></span>
+        </div>
+        ${line('پرداخت‌شده از بدهی ماه', metrics.monthPaidTotal, 'green')}
+        ${line('باقی‌مانده تعهدات تا پایان ماه', metrics.needTotal, metrics.needTotal > 0 ? 'amber' : '')}
+        ${line('کل بدهی زنده (اقساط و قرض‌ها)', metrics.liveDebtTotal)}
+        ${line('مطالبات باز', metrics.receivablesTotal, 'green')}
       </div>
     </div>
 
     <div class="panel">
-      <h2>پیشرفت تسویه بدهی‌های ماه · ${fmt(pct)}٪</h2>
-      <div class="debt-bar">
-        <span style="width:${Math.min(100, pct)}%"></span>
-        <span style="width:${Math.max(0, 100 - pct)}%"></span>
+      <div class="panel-head">
+        <h2>فوری · معوقه‌ها و سررسید ۷ روز آینده</h2>
+        <small>${fmt(urgentRows.length)} مورد</small>
       </div>
-      <div class="mini-line">
-        <span class="green">✓ ${fmt(metrics.monthPaidTotal)} تومان پرداخت‌شده</span>
-        <span class="amber">${fmt(metrics.monthOpenTotal)} تومان باقی‌مانده</span>
+      ${tableHtml(['عنوان', 'نوع', 'سررسید', 'مبلغ', 'وضعیت', 'عملیات'], obligationRowsHtml(state, urgentRows), {
+        emptyText: 'مورد معوقه یا سررسید فوری در ۷ روز آینده ندارید.',
+      })}
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>آخرین گردش حساب ماه</h2>
+        <button type="button" class="btn btn-sm btn-ghost" data-dash-nav="tx">همه تراکنش‌ها</button>
       </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head"><h2>فوری | معوقه‌ها و سررسید ۷ روز آینده</h2></div>
-      ${tableHtml(['عنوان', 'نوع', 'سررسید', 'مبلغ', 'وضعیت', 'عملیات'], obligationRowsHtml(state, urgentRows))}
-    </div>
-
-    <div class="panel">
-      <div class="panel-head"><h2>تقویم تعهدات ${esc(monthName(m))}</h2></div>
-      ${tableHtml(['عنوان', 'نوع', 'سررسید', 'مبلغ', 'وضعیت', 'عملیات'], obligationRowsHtml(state, monthCalendar))}
-    </div>
-
-    <div class="panel">
-      <div class="panel-head"><h2>آخرین گردش واقعی ماه</h2></div>
       ${tableHtml(['شرح', 'نوع', 'حساب', 'تاریخ', 'مبلغ'], recentLedger)}
     </div>
+
+    <details class="panel cockpit-details">
+      <summary>
+        <span>جزئیات محاسبات، شبیه‌ساز تسویه یکجا و تقویم ماه</span>
+        <small class="muted">مشاهده / بستن</small>
+      </summary>
+      <div class="charts-grid" style="margin-top:0">
+        <div>
+          <h3>شبیه‌ساز تسویه یکجای بدهی‌ها</h3>
+          ${line('موجودی تخمینی در تاریخ انتخاب‌شده', metrics.net)}
+          ${line('کل بدهی باقی‌مانده در همان تاریخ', metrics.allOpenTotal, 'amber')}
+          ${line(metrics.allAfter < 0 ? 'کسری برای تسویه کامل' : 'مانده پس از تسویه کامل', Math.abs(metrics.allAfter), metrics.allAfter < 0 ? 'red' : 'green')}
+        </div>
+        <div>
+          <h3>صورت خلاصه پایان ماه</h3>
+          ${line('موجودی ابتدای ماه', metrics.opening)}
+          ${line('درآمد واقعی دریافت‌شده', metrics.earned, 'green')}
+          ${line('کل پرداخت واقعی (هزینه و تعهدات)', metrics.out, 'red')}
+          ${line('دریافتی آتی ثبت‌شده ماه', metrics.plannedIn, 'green')}
+          ${line('خروجی آتی ثبت‌شده ماه', metrics.plannedOut, 'amber')}
+          ${line('معوقات از ماه‌های قبل', metrics.lateTotal, 'red')}
+        </div>
+      </div>
+
+      <div style="margin-top:18px">
+        <h3>مقایسه موجودی حساب‌ها</h3>
+        <div class="chart-box"><canvas id="dashAccountsChart"></canvas></div>
+      </div>
+
+      <div style="margin-top:18px">
+        <h3>تقویم تعهدات ${esc(monthName(m))}</h3>
+        ${tableHtml(['عنوان', 'نوع', 'سررسید', 'مبلغ', 'وضعیت', 'عملیات'], obligationRowsHtml(state, monthCalendar))}
+      </div>
+    </details>
   `;
 }
 
@@ -268,7 +268,6 @@ export function mountDashboard(container, state, { navigate }) {
   const m = state.month;
   const metrics = computeDashboardMetrics(state, m);
 
-  // Category expense chart data
   const catTotals = {};
   for (const e of metrics.c) {
     if (e.sign < 0 && (e.type === 'expense' || e.type === 'bill')) {
@@ -286,7 +285,7 @@ export function mountDashboard(container, state, { navigate }) {
 
   renderCategoryDoughnut(container.querySelector('#dashCategoryChart'), catEntries, {
     key: 'dash-cat',
-    emptyLabel: 'هنوز هزینه‌ای ثبت نشده',
+    emptyLabel: 'هنوز هزینه‌ای در این ماه ثبت نشده است',
   });
   renderAccountBalancesBar(container.querySelector('#dashAccountsChart'), metrics.accountSummaries, {
     key: 'dash-acc',
@@ -303,12 +302,7 @@ export function mountDashboard(container, state, { navigate }) {
           ensureMonthListed(draft, cur);
           draft.month = cur;
         });
-      } else if (act === 'add-income') openTxModal('income');
-      else if (act === 'add-expense') openTxModal('expense');
-      else if (act === 'add-transfer') openTransferModal();
-      else if (act === 'add-plan') openPlanWizardModal();
-      else if (act === 'add-bill') openBillModal();
-      else if (act === 'add-loan') openLoanModal();
+      } else if (act === 'add-transfer') openTransferModal();
       return;
     }
 

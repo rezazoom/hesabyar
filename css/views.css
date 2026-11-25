@@ -1,14 +1,95 @@
-.hero {
-  background: linear-gradient(125deg, color-mix(in srgb, var(--accent) 22%, var(--surface)), var(--surface));
-  border: 1px solid color-mix(in srgb, var(--accent) 50%, var(--border));
+.cockpit-summary {
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   padding: 22px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
   box-shadow: var(--shadow-sm);
+}
+
+.cockpit-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.cockpit-balance {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cockpit-balance-val {
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--fg);
+}
+
+.cockpit-balance-val.is-neg {
+  color: var(--bad);
+}
+
+.cockpit-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.cockpit-metric {
+  padding-inline: 16px;
+  border-left: 1px solid var(--border);
+  display: grid;
+  gap: 4px;
+}
+
+.cockpit-metric:first-child {
+  padding-inline-start: 0;
+}
+
+.cockpit-metric:last-child {
+  padding-inline-end: 0;
+  border-left: 0;
+}
+
+.cockpit-metric strong {
+  font-size: clamp(16px, 1.7vw, 20px);
+  font-weight: 700;
+  color: var(--fg);
+}
+
+.cockpit-bento {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.cockpit-bento > .panel {
+  margin-top: 0;
+}
+
+.cockpit-details summary {
+  cursor: pointer;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+}
+
+.cockpit-details summary::-webkit-details-marker {
+  display: none;
+}
+
+.cockpit-details[open] summary {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
 }
 
 .section-title {
@@ -30,27 +111,10 @@
   gap: 14px;
 }
 
-.finance-main .card {
-  padding: 22px;
-  border-radius: var(--radius-xl);
-}
-
-.finance-main .card:first-child {
-  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 20%, var(--surface)), var(--surface));
-}
-
-.finance-main .card:nth-child(2) {
-  border-color: color-mix(in srgb, var(--accent2) 45%, var(--border));
-  background: linear-gradient(135deg, color-mix(in srgb, var(--accent2) 18%, var(--surface)), var(--surface));
-}
-
 .finance-main .card strong,
 .finance-grid .card strong {
   white-space: nowrap;
-  direction: ltr;
-  text-align: right;
-  font-size: clamp(19px, 2.2vw, 32px);
+  font-size: clamp(18px, 2vw, 24px);
 }
 
 .finance-grid {
@@ -65,15 +129,13 @@
 
 .accounts-strip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 12px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .account-card {
-  position: relative;
-  overflow: hidden;
-  padding: 16px;
+  padding: 16px 18px;
   border-radius: var(--radius-lg);
   background: var(--surface);
   border: 1px solid var(--border);
@@ -81,20 +143,24 @@
   gap: 6px;
 }
 
-.account-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 5px;
+.account-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.account-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
   background: var(--card-accent, var(--accent));
+  flex-shrink: 0;
 }
 
 .account-card strong {
-  font-size: 20px;
-  direction: ltr;
-  text-align: right;
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--fg);
 }
 
 .charts-grid {
@@ -106,7 +172,7 @@
 
 .chart-box {
   position: relative;
-  height: 270px;
+  height: 225px;
   width: 100%;
 }
 
@@ -145,9 +211,13 @@
 
 .filter-bar {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 12px;
+}
+
+.filter-bar .filter-search {
+  grid-column: span 2;
 }
 
 .budget-grid {
@@ -175,8 +245,8 @@
 .appearance-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
-  gap: 10px;
-  margin: 14px 0;
+  gap: 8px;
+  margin: 10px 0;
 }
 
 .theme-tile {
@@ -225,12 +295,70 @@
   }
 }
 
+.appearance-controls-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+
+.range-wrap {
+  display: grid;
+  gap: 8px;
+}
+
+.color-swatches-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.color-swatch-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  cursor: pointer;
+}
+
+.color-swatch-card input[type="color"] {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.color-swatch-meta {
+  display: grid;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.color-swatch-meta span {
+  font-size: 12px;
+  color: var(--fg);
+}
+
+.color-swatch-meta code {
+  font-size: 11px;
+  color: var(--muted);
+  direction: ltr;
+  text-align: right;
+}
+
 .appearance-preview {
-  padding: 16px;
+  padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  background: linear-gradient(120deg, color-mix(in srgb, var(--accent) 18%, var(--surface)), var(--surface));
-  margin: 14px 0;
+  background: var(--surface-2);
+  margin: 10px 0;
 }
 
 .history-list {
@@ -247,11 +375,20 @@
   padding: 9px 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
-  background: color-mix(in srgb, var(--bg) 70%, var(--surface));
+  background: var(--surface-2);
 }
 
 @media (max-width: 900px) {
-  .finance-grid {
+  .finance-grid,
+  .cockpit-bento {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .color-swatches-row {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
@@ -261,8 +398,34 @@
 }
 
 @media (max-width: 560px) {
-  .hero {
+  .cockpit-summary {
     padding: 16px;
+  }
+
+  .cockpit-metrics {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .cockpit-metric {
+    padding-inline: 0;
+    padding-bottom: 10px;
+    border-left: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cockpit-metric:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+
+  .appearance-controls-row,
+  .filter-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-bar .filter-search {
+    grid-column: span 1;
   }
 
   .finance-main,

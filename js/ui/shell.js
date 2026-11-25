@@ -27,6 +27,8 @@ import { icon } from './icons.js';
 import { confirmDialog } from './modal.js';
 import { showToast } from './toast.js';
 
+const BRAND_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 21 12 12 21 3 12Z"/><path d="M12 8.2 15.8 12 12 15.8 8.2 12Z" fill="currentColor" stroke="none"/></svg>`;
+
 const NAV_ITEMS = [
   { id: 'dash', label: 'داشبورد', icon: 'LayoutDashboard', mobile: true },
   { id: 'tx', label: 'درآمد و هزینه', icon: 'Receipt', mobile: true },
@@ -102,7 +104,7 @@ function renderSidebar(state, dueCount) {
   sidebar.innerHTML = `
     <div class="brand-box">
       <div class="brand-title">
-        <div class="brand-mark">◈</div>
+        <div class="brand-mark">${BRAND_SVG}</div>
         <div>
           <strong>حساب‌یار</strong>
           <small>مدیریت مالی شخصی</small>
@@ -144,14 +146,11 @@ function renderSidebar(state, dueCount) {
 
     <div class="sidebar-footer">
       <div class="sidebar-tools">
-        <button type="button" class="btn btn-sm btn-ghost" data-shell-act="toggle-theme">${icon('Sun', 'sm')} / ${icon('Moon', 'sm')}</button>
-        <button type="button" class="btn btn-sm btn-ghost" data-shell-act="appearance">${icon('SlidersHorizontal', 'sm')} ظاهر</button>
         <button type="button" class="btn btn-sm btn-ghost" data-shell-act="backup">${icon('Download', 'sm')} پشتیبان</button>
         <button type="button" class="btn btn-sm btn-ghost" data-shell-act="restore">${icon('Upload', 'sm')} بازیابی</button>
-        <button type="button" class="btn btn-sm btn-ghost" data-shell-act="xlsx">${icon('FileSpreadsheet', 'sm')} اکسل ماه</button>
         <button type="button" class="btn btn-sm btn-ghost" data-shell-act="undo">${icon('Undo2', 'sm')} برگشت</button>
       </div>
-      <small style="font-size:11px;line-height:1.5">اطلاعات فقط در همین دستگاه ذخیره می‌شود.</small>
+      <small style="font-size:11px;line-height:1.5">ذخیره محلی در مرورگر این دستگاه</small>
     </div>
   `;
 }
@@ -165,12 +164,9 @@ function renderTopbar(state) {
   topbar.innerHTML = `
     <div class="topbar-title">
       <div class="topbar-mobile-brand">
-        <div class="brand-mark" style="width:30px;height:30px;font-size:13px">◈</div>
+        <div class="brand-mark" style="width:30px;height:30px">${BRAND_SVG}</div>
       </div>
-      <div>
-        <h2 style="margin:0">${esc(viewMeta.title)}</h2>
-        <small>${esc(monthName(state.month))}</small>
-      </div>
+      <h2 style="margin:0">${esc(viewMeta.title)}</h2>
     </div>
 
     <div class="topbar-actions">
@@ -184,8 +180,8 @@ function renderTopbar(state) {
       </div>
       <button type="button" class="btn btn-sm btn-ghost topbar-desktop-only" data-shell-act="csv">${icon('Download', 'sm')} CSV ماه</button>
       <button type="button" class="btn btn-sm btn-ghost topbar-desktop-only" data-shell-act="xlsx">${icon('FileSpreadsheet', 'sm')} اکسل ماه</button>
-      <button type="button" class="btn btn-sm btn-ghost" data-shell-act="toggle-theme" aria-label="تغییر تم روشن/تاریک">${icon('Sun', 'sm')}</button>
-      <button type="button" class="btn btn-sm btn-primary topbar-desktop-only" data-shell-act="appearance">${icon('SlidersHorizontal', 'sm')} شخصی‌سازی ظاهر</button>
+      <button type="button" class="btn btn-icon btn-sm btn-ghost" data-shell-act="toggle-theme" title="تغییر تم روشن/تاریک" aria-label="تغییر تم روشن/تاریک">${icon('Sun', 'sm')}</button>
+      <button type="button" class="btn btn-sm btn-ghost topbar-desktop-only" data-shell-act="appearance">${icon('SlidersHorizontal', 'sm')} ظاهر</button>
     </div>
   `;
 }

@@ -116,15 +116,12 @@
   box-shadow: var(--shadow-sm);
 }
 
-.card {
-  background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 8%, var(--surface)), var(--surface));
-}
-
 .card strong {
   display: block;
-  font-size: clamp(18px, 2vw, 26px);
-  font-weight: 800;
-  margin: 8px 0 6px;
+  font-size: clamp(18px, 2vw, 24px);
+  font-weight: 700;
+  color: var(--fg);
+  margin: 8px 0 4px;
   overflow-wrap: anywhere;
 }
 
@@ -596,16 +593,16 @@ dialog::backdrop {
 }
 
 .bubble-trigger {
-  width: 56px;
-  height: 56px;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
-  border: 0;
+  border: 1px solid color-mix(in srgb, #ffffff 14%, var(--accent));
   padding: 0;
   display: grid;
   place-items: center;
   cursor: pointer;
   color: var(--accent-text);
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  background: var(--accent);
   box-shadow: var(--shadow-md);
   transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), filter 0.15s ease;
 }
@@ -649,6 +646,22 @@ dialog::backdrop {
   text-align: center;
   padding: 28px 16px;
   color: var(--muted);
+}
+
+.empty-chart {
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--muted);
+  text-align: center;
+  font-size: 13px;
 }
 
 @media (max-width: 960px) {

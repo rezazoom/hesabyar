@@ -41,18 +41,39 @@ function getChartCtor() {
   return globalThis.Chart || null;
 }
 
-export function renderCategoryDoughnut(canvas, entries, { key = 'cat-doughnut', emptyLabel = 'داده‌ای ثبت نشده' } = {}) {
+function showEmptyChart(canvas, message) {
+  if (!canvas?.parentElement) return;
+  canvas.classList.add('hidden');
+  let empty = canvas.parentElement.querySelector('.empty-chart');
+  if (!empty) {
+    empty = document.createElement('div');
+    empty.className = 'empty-chart';
+    canvas.parentElement.appendChild(empty);
+  }
+  empty.textContent = message;
+}
+
+function clearEmptyChart(canvas) {
+  if (!canvas?.parentElement) return;
+  canvas.classList.remove('hidden');
+  canvas.parentElement.querySelector('.empty-chart')?.remove();
+}
+
+export function renderCategoryDoughnut(canvas, entries, { key = 'cat-doughnut', emptyLabel = 'داده‌ای ثبت نشده است' } = {}) {
   destroyChart(key);
   const Chart = getChartCtor();
   if (!Chart || !canvas) return null;
 
+  if (!entries.length) {
+    showEmptyChart(canvas, emptyLabel);
+    return null;
+  }
+
+  clearEmptyChart(canvas);
   const p = readThemePalette();
-  const hasData = entries.length > 0;
-  const labels = hasData ? entries.map((e) => e.label) : [emptyLabel];
-  const values = hasData ? entries.map((e) => e.amount) : [1];
-  const colors = hasData
-    ? entries.map((e, idx) => e.color || [p.accent, p.accent2, p.good, p.warn, p.bad][idx % 5])
-    : [p.border];
+  const labels = entries.map((e) => e.label);
+  const values = entries.map((e) => e.amount);
+  const colors = entries.map((e, idx) => e.color || [p.accent, p.accent2, p.good, p.warn, p.bad][idx % 5]);
 
   const chart = new Chart(canvas, {
     type: 'doughnut',
@@ -70,7 +91,7 @@ export function renderCategoryDoughnut(canvas, entries, { key = 'cat-doughnut', 
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '62%',
+      cutout: '66%',
       plugins: {
         legend: {
           position: 'bottom',
@@ -78,13 +99,13 @@ export function renderCategoryDoughnut(canvas, entries, { key = 'cat-doughnut', 
           labels: {
             color: p.fg,
             font: { family: p.font, size: 12 },
-            boxWidth: 12,
+            boxWidth: 10,
+            usePointStyle: true,
             padding: 12,
           },
         },
         tooltip: {
           rtl: true,
-          enabled: hasData,
           titleFont: { family: p.font },
           bodyFont: { family: p.font },
           callbacks: {
@@ -104,6 +125,12 @@ export function renderMonthlyCashflowBar(canvas, rows, { key = 'monthly-bar' } =
   const Chart = getChartCtor();
   if (!Chart || !canvas) return null;
 
+  if (!rows.length || rows.every((r) => r.i === 0 && r.o === 0)) {
+    showEmptyChart(canvas, 'گردش مالی در این بازه ثبت نشده است');
+    return null;
+  }
+
+  clearEmptyChart(canvas);
   const p = readThemePalette();
   const chart = new Chart(canvas, {
     type: 'bar',
@@ -130,7 +157,7 @@ export function renderMonthlyCashflowBar(canvas, rows, { key = 'monthly-bar' } =
       plugins: {
         legend: {
           rtl: true,
-          labels: { color: p.fg, font: { family: p.font, size: 12 } },
+          labels: { color: p.fg, font: { family: p.font, size: 12 }, usePointStyle: true, boxWidth: 10 },
         },
         tooltip: {
           rtl: true,
@@ -152,7 +179,7 @@ export function renderMonthlyCashflowBar(canvas, rows, { key = 'monthly-bar' } =
             font: { family: p.font, size: 11 },
             callback: (val) => fmt(val),
           },
-          grid: { color: `${p.border}55` },
+          grid: { color: 'rgba(148, 163, 184, 0.14)' },
         },
       },
     },
@@ -167,6 +194,7 @@ export function renderAccountBalancesBar(canvas, accountSummaries, { key = 'acco
   const Chart = getChartCtor();
   if (!Chart || !canvas) return null;
 
+  clearEmptyChart(canvas);
   const p = readThemePalette();
   const chart = new Chart(canvas, {
     type: 'bar',
@@ -180,6 +208,7 @@ export function renderAccountBalancesBar(canvas, accountSummaries, { key = 'acco
             a.balance < 0 ? p.bad : a.account.color || p.accent
           ),
           borderRadius: Math.round(8 * p.radiusScale),
+          maxBarThickness: 56,
         },
       ],
     },
@@ -208,7 +237,7 @@ export function renderAccountBalancesBar(canvas, accountSummaries, { key = 'acco
             font: { family: p.font, size: 11 },
             callback: (val) => fmt(val),
           },
-          grid: { color: `${p.border}55` },
+          grid: { color: 'rgba(148, 163, 184, 0.14)' },
         },
       },
     },

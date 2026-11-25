@@ -84,12 +84,12 @@ function renderReportBodyHtml(state) {
 
   return `
     <div class="finance-grid" style="margin-top:14px">
-      <div class="card"><small>درآمد واقعی</small><strong class="green num">${fmt(earned)}</strong><small>تومان</small></div>
-      <div class="card"><small>مجموع ورودی نقدی</small><strong class="green num">${fmt(inc)}</strong><small>تومان</small></div>
-      <div class="card"><small>مجموع خروجی نقدی</small><strong class="red num">${fmt(out)}</strong><small>تومان</small></div>
-      <div class="card"><small>هزینه، اقساط و قبوض</small><strong class="red num">${fmt(spent)}</strong><small>تومان</small></div>
-      <div class="card"><small>خالص گردش بازه</small><strong class="${inc - out >= 0 ? 'green' : 'red'} num">${fmt(inc - out)}</strong><small>تومان</small></div>
-      <div class="card"><small>مانده تعهدات فیلترشده</small><strong class="amber num">${fmt(openFiltered)}</strong><small>تومان</small></div>
+      <div class="card"><small>درآمد واقعی</small><strong class="num"><span class="num-ltr">${fmt(earned)}</span><span class="unit">تومان</span></strong></div>
+      <div class="card"><small>مجموع ورودی نقدی</small><strong class="num"><span class="green">+</span> ${fmt(inc)}<span class="unit">تومان</span></strong></div>
+      <div class="card"><small>مجموع خروجی نقدی</small><strong class="num"><span class="red">−</span> ${fmt(out)}<span class="unit">تومان</span></strong></div>
+      <div class="card"><small>هزینه، اقساط و قبوض</small><strong class="num"><span class="num-ltr">${fmt(spent)}</span><span class="unit">تومان</span></strong></div>
+      <div class="card"><small>خالص گردش بازه</small><strong class="num ${inc - out < 0 ? 'red' : ''}"><span class="num-ltr">${fmt(inc - out)}</span><span class="unit">تومان</span></strong></div>
+      <div class="card"><small>مانده تعهدات فیلترشده</small><strong class="num ${openFiltered > 0 ? 'amber' : ''}"><span class="num-ltr">${fmt(openFiltered)}</span><span class="unit">تومان</span></strong></div>
     </div>
 
     <div class="charts-grid">
@@ -193,7 +193,7 @@ export function renderReports(state) {
 
   return `
     <div class="panel">
-      <div class="panel-head"><h2>مرکز تحلیل و گزارش مالی</h2></div>
+      <div class="panel-head"><h2>گزارش و تحلیل مالی</h2></div>
       <div class="filter-bar">
         <label class="field"><span>از ماه</span><select id="repFrom">${monthOpts(F.from)}</select></label>
         <label class="field"><span>تا ماه</span><select id="repTo">${monthOpts(F.to)}</select></label>
@@ -233,9 +233,9 @@ export function renderReports(state) {
               .join('')}
           </select>
         </label>
-        <label class="field">
+        <label class="field filter-search">
           <span>جستجو</span>
-          <input id="repSearch" type="search" value="${esc(F.search)}" placeholder="عنوان یا دسته...">
+          <input id="repSearch" type="search" value="${esc(F.search)}" placeholder="عنوان یا دسته‌بندی...">
         </label>
       </div>
 

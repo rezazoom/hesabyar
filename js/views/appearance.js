@@ -48,7 +48,7 @@ export function renderAppearanceModal() {
         .join('')}
     </div>
 
-    <div class="grid">
+    <div class="appearance-controls-row">
       <label class="field">
         <span>فونت رابط کاربری</span>
         <select id="appFontSelect">
@@ -58,25 +58,31 @@ export function renderAppearanceModal() {
         </select>
       </label>
 
-      <label class="field">
+      <label class="field range-wrap">
         <span>اندازه نوشته: <b id="appSizeVal">${toPersianDigits(Number(app.size) || 14)}</b> px</span>
         <input id="appSizeRange" type="range" min="12" max="20" value="${Number(app.size) || 14}">
       </label>
+    </div>
 
+    <div class="color-swatches-row">
       ${[
         ['accent', 'رنگ اصلی', 3],
         ['accent2', 'رنگ مکمل', 4],
         ['bg', 'پس‌زمینه', 1],
         ['surface', 'رنگ کارت‌ها', 2],
       ]
-        .map(
-          ([key, label, idx]) => `
-        <label class="field">
-          <span>${esc(label)}</span>
-          <input type="color" data-color-key="${key}" value="${hexColor(app.colors?.[key], activeTheme[idx])}">
-        </label>
-      `
-        )
+        .map(([key, label, idx]) => {
+          const val = hexColor(app.colors?.[key], activeTheme[idx]);
+          return `
+            <label class="color-swatch-card">
+              <input type="color" data-color-key="${key}" value="${val}">
+              <span class="color-swatch-meta">
+                <span>${esc(label)}</span>
+                <code>${esc(val)}</code>
+              </span>
+            </label>
+          `;
+        })
         .join('')}
     </div>
 
@@ -97,8 +103,8 @@ export function renderAppearanceModal() {
     </div>
 
     <div class="appearance-preview">
-      <small>پیش‌نمایش زنده · موجودی تخمینی</small>
-      <h1 class="green" style="margin:6px 0">۲۵٬۸۰۰٬۰۰۰ تومان</h1>
+      <small>پیش‌نمایش زنده · موجودی نمونه</small>
+      <div class="cockpit-balance-val num" style="margin:6px 0 10px;font-size:24px"><span class="num-ltr">۲۵٬۸۰۰٬۰۰۰</span><span class="unit">تومان</span></div>
       <div class="row" style="margin-bottom:10px">
         <button type="button" class="btn btn-sm btn-primary" tabindex="-1">دکمه نمونه</button>
         <button type="button" class="btn btn-sm btn-ghost" tabindex="-1">دکمه ثانویه</button>
@@ -169,9 +175,11 @@ export function renderAppearanceModal() {
   });
 
   container.querySelectorAll('[data-color-key]').forEach((inp) => {
-    inp.addEventListener('input', (e) => {
+    inp.addEventListener('input', () => {
       const key = inp.getAttribute('data-color-key');
-      const nextColors = { ...(getAppearance().colors || {}), [key]: e.target.value };
+      const codeEl = inp.closest('.color-swatch-card')?.querySelector('code');
+      if (codeEl) codeEl.textContent = inp.value;
+      const nextColors = { ...(getAppearance().colors || {}), [key]: inp.value };
       setAppearance({ colors: nextColors });
     });
   });
