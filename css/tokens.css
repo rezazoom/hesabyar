@@ -39,11 +39,13 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
 }
 
 body {
   margin: 0;
   min-height: 100dvh;
+  overflow-x: clip;
   font-family: var(--ui-font);
   font-size: var(--ui-size);
   line-height: 1.65;
@@ -102,6 +104,13 @@ small,
 .kpi-value,
 strong[data-num],
 td.num {
+  font-variant-numeric: tabular-nums;
+}
+
+.num-ltr {
+  direction: ltr;
+  display: inline-block;
+  unicode-bidi: isolate;
   font-variant-numeric: tabular-nums;
 }
 

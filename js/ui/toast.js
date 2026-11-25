@@ -8,9 +8,13 @@ const ICONS_BY_TYPE = {
   info: 'HelpCircle',
 };
 
-export function showToast(message, { type = 'info', duration = 3800 } = {}) {
+export function showToast(message, { type = 'info', duration = 3500 } = {}) {
   const container = document.getElementById('toastContainer');
   if (!container) return;
+
+  while (container.children.length >= 2) {
+    container.firstElementChild?.remove();
+  }
 
   const toast = document.createElement('div');
   toast.className = `toast ${type}`;

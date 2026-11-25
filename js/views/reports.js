@@ -83,7 +83,7 @@ function renderReportBodyHtml(state) {
   const openFiltered = sumAmounts(o.filter((x) => x.remaining > 0 && x.kind !== 'lend'), 'remaining');
 
   return `
-    <div class="grid" style="margin-top:14px">
+    <div class="finance-grid" style="margin-top:14px">
       <div class="card"><small>درآمد واقعی</small><strong class="green num">${fmt(earned)}</strong><small>تومان</small></div>
       <div class="card"><small>مجموع ورودی نقدی</small><strong class="green num">${fmt(inc)}</strong><small>تومان</small></div>
       <div class="card"><small>مجموع خروجی نقدی</small><strong class="red num">${fmt(out)}</strong><small>تومان</small></div>

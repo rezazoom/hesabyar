@@ -180,7 +180,7 @@ export function renderDashboard(state) {
             <small class="pill">${esc(ACCOUNT_TYPE_LABELS[s.account.type] || s.account.type)}</small>
           </div>
           <strong class="${s.balance < 0 ? 'red' : 'green'} num">${fmt(s.balance)} <small>تومان</small></strong>
-          <small>اول ماه: ${fmt(s.opening)} (${s.openingSource === 'manual' ? 'دستی' : 'خودکار'})</small>
+          <small>اول ماه: <span class="num-ltr">${fmt(s.opening)}</span> (${s.openingSource === 'manual' ? 'دستی' : 'خودکار'})</small>
         </div>
       `
         )

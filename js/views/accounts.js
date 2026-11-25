@@ -37,9 +37,9 @@ export function renderAccounts(state) {
               <small class="pill">${esc(ACCOUNT_TYPE_LABELS[s.account.type] || s.account.type)}</small>
             </div>
             <strong class="${s.balance < 0 ? 'red' : 'green'} num">${fmt(s.balance)} <small>تومان</small></strong>
-            <div class="mini-line"><span>ابتدای ماه</span><b class="num">${fmt(s.opening)}</b></div>
-            <div class="mini-line"><span>ورودی ماه</span><b class="green num">+ ${fmt(s.inFlow)}</b></div>
-            <div class="mini-line"><span>خروجی ماه</span><b class="red num">− ${fmt(s.outFlow)}</b></div>
+            <div class="mini-line"><span>ابتدای ماه</span><b class="num-ltr">${fmt(s.opening)}</b></div>
+            <div class="mini-line"><span>ورودی ماه</span><b class="green num-ltr">+ ${fmt(s.inFlow)}</b></div>
+            <div class="mini-line"><span>خروجی ماه</span><b class="red num-ltr">− ${fmt(s.outFlow)}</b></div>
             <div class="row" style="margin-top:6px">
               <button type="button" class="btn btn-sm btn-ghost" data-acc-edit="${esc(s.account.id)}">${icon('Pencil', 'sm')} ویرایش</button>
               ${
