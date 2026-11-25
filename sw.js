@@ -11,7 +11,11 @@ const PRECACHE_URLS = [
   './vendor/jalaali.js',
   './vendor/chart.umd.min.js',
   './vendor/lucide.min.js',
-  './vendor/write-excel-file.min.js'
+  './vendor/write-excel-file.min.js',
+  './css/tokens.css',
+  './css/layout.css',
+  './css/components.css',
+  './css/views.css'
 ];
 
 self.addEventListener('install', (event) => {
